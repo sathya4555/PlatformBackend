@@ -144,16 +144,48 @@ async getfeature(){
   return empsdto
 }
 
+public async deletefeature(@Body()body:ResponseModel<featureDTO>): Promise<ResponseModel<featureDTO>>{
+  let emp: Feature = await this.getOnefeature(body.id)
+  emp.id=body.id
+  await this.featureRepository.remove(emp)
 
-private entityToDTOfeaturegetfeature(data : Feature){
-      
-  const clientdto = new featureDTO();
-   clientdto.id=data.id
-  clientdto.featurename = data.featurename
-  clientdto.adminname = data.adminname
-  clientdto.featuredesciption = data.featuredesciption
-  return clientdto
+  const empDto: ResponseModel<featureDTO> = this.entityToDTOfeature(emp)
+ return empDto
+
 }
+
+
+public async getOnefeature(empid: number)
+{
+    const emp: Feature = await this.featureRepository.findOne(empid)
+  // console.log("sathya")
+    if(!emp) throw new NotFoundException(`Feature with ID ${empid} was not found`)
+    let empdto: any = this.entityToDTOfeature(emp)
+
+    return empdto
+
+}
+
+
+async updateFeature(@Body()body:ResponseModel<featureDTO>): Promise<ResponseModel<featureDTO>>
+{
+  console.log(body.id);
+  const cms: Feature = await this.getOnefeature(body.id)
+  //console.log(body.id);
+//cms.id=body.id
+  cms.featurename=body.featurename
+  cms.adminname=body.adminname
+  cms.featuredesciption=body.featuredesciption
+ // console.log(cms.methodname);
+await this.featureRepository.save(cms)
+
+const empDto: ResponseModel<featureDTO> = this.entityToDTOfeature(cms)
+ return empDto
+//const empDto: roleDTO = this.entityToDTO(cms)
+//return empDto
+}
+
+
 
 
 }

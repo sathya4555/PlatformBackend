@@ -8,6 +8,7 @@ import { appDTO } from 'src/dto/appDTO';
 import { clienDTO } from 'src/dto/clientDTO';
 import { SNS_SQS } from 'Submodules/SNS_SQS';
 import { AppDataService } from '../facade/app-data.service';
+import { featureDTO } from 'src/dto/featureDTO';
 
 @Controller('app-data')
 export class AppDataController {
@@ -17,8 +18,8 @@ export class AppDataController {
     ) { }
 
     private sns_sqs = SNS_SQS.getInstance();
-    private topicArray = ['STUDENT_ADD', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE', 'ROLE_ADD', 'ROLE_UPDATE', 'APP_ADD', 'FEATURE_ADD',"APP_UPDATE"];
-    private serviceName = ['STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', "STUDENTCOURSE_SERVICE", "STUDENTCOURSE_SERVICE", 'STUDENTCOURSE_SERVICE', "STUDENTCOURSE_SERVICE","STUDENTCOURSE_SERVICE"];
+    private topicArray = ['STUDENT_ADD', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE', 'ROLE_ADD', 'ROLE_UPDATE', 'APP_ADD', 'FEATURE_ADD', "APP_UPDATE", "APP_DELETE", 'FEATURE_DELETE', 'FEATURE_UPDATE'];
+    private serviceName = ['STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', "STUDENTCOURSE_SERVICE", "STUDENTCOURSE_SERVICE", 'STUDENTCOURSE_SERVICE', "STUDENTCOURSE_SERVICE", "STUDENTCOURSE_SERVICE", 'STUDENTCOURSE_SERVICE', "STUDENTCOURSE_SERVICE", 'STUDENTCOURSE_SERVICE'];
 
 
     onModuleInit() {
@@ -31,11 +32,12 @@ export class AppDataController {
                     // console.log("inside we")
                     console.log("Result is........" + JSON.stringify(result));
                     try {
-                        let responseModelOfProductDto: ResponseModel<appDTO> = null;
+                        let responseModelOfProductDto: ResponseModel<any> = null;
+                        // let responseModelOfProductDto1: ResponseModel<featureDTO> = null;
                         console.log(`listening to  ${value} topic.....result is....`);
                         // ToDo :- add a method for removing queue message from queue....
                         switch (value) {
-                           
+
                             case 'APP_ADD':
                                 console.log("Inside APP ADD Topic");
                                 responseModelOfProductDto = await this.addApp(result["message"]);
@@ -45,11 +47,20 @@ export class AppDataController {
                                 responseModelOfProductDto = await this.addFeature(result["message"]);
                                 break;
 
-                                case 'APP_UPDATE':
-                                    console.log("Inside APP ADD Topic");
-                                    responseModelOfProductDto = await this.editRoles(result["message"]);
+                            case 'APP_UPDATE':
+                                console.log("Inside APP UPDATE Topic");
+                                responseModelOfProductDto = await this.editRoles(result["message"]);
+                                break;
+                            case 'APP_DELETE':
+                                console.log("Inside APP DELETE Topic");
+                                responseModelOfProductDto = await this.deleteApp(result["message"]);
+                                break;
+
+                                case 'FEATURE_UPDATE':
+                                    console.log("Inside FEATURE UPDATE Topic");
+                                    responseModelOfProductDto = await this.editfeature(result["message"]);
                                     break;
-                                
+
 
 
 
@@ -94,55 +105,72 @@ export class AppDataController {
 
     }
 
-    
-@Post('addapp')
-public async addApp(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
 
-  //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
-  const result = await this.appService.addApp(body)
-console.log("insisadajdgejdgjhhjdasfs");
+    @Post('addapp')
+    public async addApp(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
 
-  return result
-}
+        //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
+        const result = await this.appService.addApp(body)
+        console.log("insisadajdgejdgjhhjdasfs");
 
-
-
-@Post('addfeature')
-public async addFeature(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
-
-  //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
-  const result = await this.appService.addFeature(body)
-  console.log("insisadajdgejdgjhhjdasfs");
-  return result
-}
+        return result
+    }
 
 
 
-@Get('getApps')
-async getRoles(){
-   const result= await this.appService.getApps();
-    return result
-}
+    @Post('addfeature')
+    public async addFeature(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
 
-@Put('editrole')
-async editRoles(@Body() body: ResponseModel<appDTO>): Promise<ResponseModel<appDTO>>{
-  JSON.stringify(body)
-  const result1= await this.appService.updateApps(body)
-  return result1
-}
+        //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
+        const result = await this.appService.addFeature(body)
+        console.log("insisadajdgejdgjhhjdasfs");
+        return result
+    }
 
 
-@Delete('deleteapp')
-@HttpCode(HttpStatus.NO_CONTENT)
-public async deleteOne(@Body() body: ResponseModel<appDTO>): Promise<ResponseModel<appDTO>>{
-    const result = await this.appService.deleteApp(body)
-    return  result
-}
 
-@Get('getfeatures')
-async getfeature(){
-   const result= await this.appService.getfeature();
-    return result
-}
+    @Get('getApps')
+    async getRoles() {
+        const result = await this.appService.getApps();
+        return result
+    }
+
+    @Put('editapps')
+    async editRoles(@Body() body: ResponseModel<appDTO>): Promise<ResponseModel<appDTO>> {
+        JSON.stringify(body)
+        const result1 = await this.appService.updateApps(body)
+        return result1
+    }
+
+
+    @Put('editfeature')
+    async editfeature(@Body() body: ResponseModel<featureDTO>): Promise<ResponseModel<featureDTO>> {
+        JSON.stringify(body)
+        const result1 = await this.appService.updateFeature(body)
+        return result1
+    }
+
+
+
+    @Delete('deleteapp')
+    // @HttpCode(HttpStatus.NO_CONTENT)
+    public async deleteApp(@Body() body: ResponseModel<appDTO>): Promise<ResponseModel<appDTO>> {
+        const result = await this.appService.deleteApp(body)
+        return result
+    }
+
+    @Get('getfeatures')
+    async getfeature() {
+        const result = await this.appService.getfeature();
+        return result
+    }
+
+
+    @Delete('deletefeature')
+    // @HttpCode(HttpStatus.NO_CONTENT)
+    public async deletefeature(@Body() body: ResponseModel<featureDTO>): Promise<ResponseModel<featureDTO>> {
+        const result = await this.appService.deletefeature(body)
+        return result
+    }
 
 }

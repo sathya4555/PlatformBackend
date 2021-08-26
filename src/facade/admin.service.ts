@@ -209,4 +209,27 @@ private entityToDTOfeature(data : Feature): ResponseModel<featureDTO>{
 }
 
 
+public async deleterole(@Body()body:ResponseModel<roleDTO>): Promise<ResponseModel<roleDTO>>{
+  let emp: Role = await this.getOne(body.id)
+  emp.id=body.id
+  await this.roleRepository.remove(emp)
+
+  const empDto: ResponseModel<roleDTO> = this.entityToDTORole(emp)
+ return empDto
+
+}
+
+private entityToDTORole(data : Role): ResponseModel<roleDTO>{
+
+  const clientdto = new ResponseModel<roleDTO>()
+   clientdto.id=data.id
+  clientdto.rolename = data.rolename
+  clientdto.adminname = data.adminname
+  clientdto.methodname = data.methodname
+
+  return clientdto
+}
+
+
+
 }

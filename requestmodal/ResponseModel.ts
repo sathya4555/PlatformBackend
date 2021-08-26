@@ -2,6 +2,7 @@ import { ServiceOperationResultType } from "./ServiceOperationResultType";
 import { Message } from "./Message";
 import { DtoBase } from "./DtoBase";
 import { App } from "src/entity/app.entity";
+import { Role } from "src/entity/role.entity";
 export class ResponseModel<TDto extends DtoBase> {
  
   private RequestId: string;
@@ -27,6 +28,11 @@ public app:App
 
   public featurename:string
   public featuredesciption:string
+
+  //
+  public approlename:string
+  public rolepermission:string
+  public role:Role
   constructor(
     requestId?: string,
     data?: Array<TDto> | null,
@@ -48,7 +54,9 @@ methodname?:string[],
 app?:App,
      featurename?:string,
      featuredesciption?:string,
-
+approlename?:string,
+rolepermission?:string,
+role?:Role
   ) {
     this.RequestId = requestId;
     this.DataCollection = data;
@@ -70,7 +78,10 @@ app?:App,
     this.appdesciption=appdesciption
     this.featuredesciption=featuredesciption
     this.featurename=featurename
-this.app=app
+    this.approlename=approlename
+    this.rolepermission=rolepermission
+    this.role=role
+    this.app=app
   }
 
   public getRequestId(): string {
@@ -80,6 +91,20 @@ this.app=app
   // public setErrorCode(code:string): void{
   //   this.Status.setErrorCode(code);
   // }
+  public setapprole(RequestId: string): void {
+    this.approlename = RequestId;
+  }
+
+  public setapprolpermissions(RequestId: string): void {
+    this.rolepermission = RequestId;
+  }
+
+  public setRoleforignkey(RequestId: Role): void {
+    this.role = RequestId;
+  }
+  
+
+  
 
   public setappID(RequestId: App): void {
     this.app = RequestId;

@@ -12,6 +12,7 @@ import { clienDTO } from 'src/dto/clientDTO';
 import { RequestModel } from 'requestmodal/RequestModel';
 import { ResponseModel } from 'requestmodal/ResponseModel';
 import { roleDTO } from 'src/dto/roleTable.dto';
+import { Delete } from '@nestjs/common';
 
 @Controller('component')
 export class AdminController {
@@ -24,8 +25,8 @@ export class AdminController {
       
 
   private sns_sqs = SNS_SQS.getInstance();
-  private topicArray = ['STUDENT_ADD', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE','ROLE_ADD','ROLE_UPDATE'];
-  private serviceName = ['STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE',"STUDENTCOURSE_SERVICE","STUDENTCOURSE_SERVICE",'STUDENTCOURSE_SERVICE'];
+  private topicArray = ['STUDENT_ADD', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE','ROLE_ADD','ROLE_UPDATE','ROLE_DELETE'];
+  private serviceName = ['STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE',"STUDENTCOURSE_SERVICE","STUDENTCOURSE_SERVICE",'STUDENTCOURSE_SERVICE','STUDENTCOURSE_SERVICE'];
 
   onModuleInit() {
     console.log("inside mod")
@@ -53,6 +54,10 @@ export class AdminController {
                     console.log("Inside ROLE UPDATE Topic");
                     responseModelOfProductDto = await this.editRoles(result["message"]);
                     break;
+                    case 'ROLE_DELETE':
+                      console.log("Inside ROLE DELETE Topic");
+                      responseModelOfProductDto = await this.deletefeature(result["message"]);
+                      break;
                    
             
           
@@ -288,13 +293,20 @@ public async addApp(@Body() body: ResponseModel<any>): Promise<ResponseModel<any
 
 
 
-@Post('addapp')
+@Post('addfeature')
 public async addFeature(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
 
   //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
   const result = await this.appService.addFeature(body)
 
   return result
+}
+
+@Delete('deleterole')
+// @HttpCode(HttpStatus.NO_CONTENT)
+public async deletefeature(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>>{
+    const result = await this.appService.deleterole(body)
+    return  result
 }
 
 }
