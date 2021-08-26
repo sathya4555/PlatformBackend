@@ -7,3 +7,6 @@
 [submodule "Platform-entity"]
 	path = Platform-entity
 	url = https://github.com/sathya4555/Platform-entity.git
+[submodule "Platform-Submodules"]
+	path = Platform-Submodules
+	url = https://github.com/sathya4555/Platform-Submodules.git
