@@ -3,6 +3,7 @@ import { Message } from "./Message";
 import { DtoBase } from "./DtoBase";
 import { App } from "src/entity/app.entity";
 import { Role } from "src/entity/role.entity";
+import { Admin } from "src/entity/admin.entity";
 export class ResponseModel<TDto extends DtoBase> {
  
   private RequestId: string;
@@ -18,7 +19,7 @@ export class ResponseModel<TDto extends DtoBase> {
    // name: string;
     id: number;
     public name: string;
-    public roleid: string;
+    public roleid: Role;
     public adminname:  string;
   public rolename: string;
   public methodname: string[]
@@ -33,6 +34,8 @@ public app:App
   public approlename:string
   public rolepermission:string
   public role:Role
+  public admin:Admin
+  public password: string
   constructor(
     requestId?: string,
     data?: Array<TDto> | null,
@@ -48,7 +51,7 @@ public app:App
 rolename?:string,
     adminname?: string,
 methodname?:string[],
-    roleid?: string,  
+    roleid?: Role,  
     appname?: string,
      appdesciption?:string,
 app?:App,
@@ -56,7 +59,9 @@ app?:App,
      featuredesciption?:string,
 approlename?:string,
 rolepermission?:string,
-role?:Role
+admin?:Admin,
+role?:Role,
+password?:string
   ) {
     this.RequestId = requestId;
     this.DataCollection = data;
@@ -82,11 +87,14 @@ role?:Role
     this.rolepermission=rolepermission
     this.role=role
     this.app=app
+    this.admin=admin
+    this.password=password
   }
 
   public getRequestId(): string {
     return this.RequestId;
   }
+
 
   // public setErrorCode(code:string): void{
   //   this.Status.setErrorCode(code);
@@ -94,6 +102,17 @@ role?:Role
   public setapprole(RequestId: string): void {
     this.approlename = RequestId;
   }
+
+  public setadmin(RequestId: Admin): void {
+    this.admin = RequestId;
+  }
+
+  
+  public setpassword(RequestId: string): void {
+    this.password = RequestId;
+  }
+
+
 
   public setapprolpermissions(RequestId: string): void {
     this.rolepermission = RequestId;
@@ -130,7 +149,7 @@ role?:Role
     this.name = RequestId;
   }
 
-  public setRole(RequestId: string): void {
+  public setRole(RequestId: Role): void {
     this.roleid = RequestId;
   }
   public setRolename(RequestId: string): void {

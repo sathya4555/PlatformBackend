@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, HttpService, Module } from '@nestjs/common';
 import { ApproleService } from '../approle/approle.service';
 import { ApproleController } from '../Routes/approle.controller';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,11 +14,12 @@ import { AppRoles } from 'src/entity/app_roles.entity';
 @Module({
   providers: [ApproleService],
   controllers: [ApproleController],
-  imports: [TypeOrmModule.forFeature([Admin,Role,Client,Crud,App,Feature,AppRoles]),
+  imports: [HttpModule,TypeOrmModule.forFeature([Admin,Role,Client,Crud,App,Feature,AppRoles]),
   JwtModule.register({
     secret: 'secret',
     signOptions:{expiresIn: '2d'}
-  })
+  }),
+
 
 ],
 })

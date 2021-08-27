@@ -11,7 +11,7 @@ import { SNS_SQS } from 'Submodules/SNS_SQS';
 import { clienDTO } from 'src/dto/clientDTO';
 import { RequestModel } from 'requestmodal/RequestModel';
 import { ResponseModel } from 'requestmodal/ResponseModel';
-import { roleDTO } from 'src/dto/roleTable.dto';
+// import { roleDTO } from 'src/dto/roleTable.dto';
 import { Delete } from '@nestjs/common';
 
 @Controller('component')
@@ -44,7 +44,7 @@ export class AdminController {
             switch (value) {
               case 'STUDENT_ADD':
                 console.log("Inside STUDENT_ADD Topic");
-                responseModelOfProductDto = await this.createOne(result["message"]);
+                responseModelOfProductDto = await this.adClient(result["message"]);
                 break;
                 case 'ROLE_ADD':
                   console.log("Inside ROLE ADD Topic");
@@ -222,37 +222,34 @@ public async addRole(@Body() body: ResponseModel<any>): Promise<ResponseModel<an
 
 
 
+// @Post('addclient')
+// async adClient(
+//     @Body('name') name: string,
+//      @Body('adminname') adminname: string,
+//      @Body('role') roleid: string,
+//    // @Req() request: Request,
+//     )   
+//     {
+//   const user = await this.appService.addclient({
+//           name,
+//           adminname,
+//           roleid
+//         });
+//         return user    
+// }
+
+
+
 @Post('addclient')
-async adClient(
-    @Body('name') name: string,
-     @Body('adminname') adminname: string,
-     @Body('role') roleid: string,
+public async adClient(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
 
-   // @Req() request: Request,
-    
-    )
-    
-    {
+  //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
+  const result = await this.appService.addclient(body)
 
-   
-        const user = await this.appService.addclient({
-          name,
-          adminname,
-          roleid
-        });
-
-        // const id=roleid
-    
-
-        // const userRole = await this.appService.addRoletoRole({
-        //     id,
-          
-        // });
-
-        return user
-     
-
+  return result
 }
+
+
 
 @Post('crud')
 async addCrud( @Body('methodname') methodname: string,
@@ -270,6 +267,20 @@ async getRoles(){
    const result= await this.appService.getRoles();
     return result
 }
+
+
+@Get('getadmin')
+async getadmin(){
+   const result= await this.appService.getAdmin();
+    return result
+}
+
+@Get('getClient')
+async getClient(){
+   const result= await this.appService.getClient();
+    return result
+}
+
 
 
 @Put('editrole')

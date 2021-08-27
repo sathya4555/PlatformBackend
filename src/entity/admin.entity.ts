@@ -17,7 +17,11 @@ export class Admin {
 
 
 
-  @OneToMany(() => Client,client=>client.admin)
+  @OneToMany(() => Client,client=>client.id)
   client:Client
+
+     
+ 
+
 
 } 

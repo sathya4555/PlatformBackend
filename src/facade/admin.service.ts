@@ -2,6 +2,7 @@ import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResponseModel } from 'requestmodal/ResponseModel';
 import { empty } from 'rxjs';
+import { adminDTO } from 'src/dto/adminDTO';
 import { appDTO } from 'src/dto/appDTO';
 import { clienDTO } from 'src/dto/clientDTO';
 import { featureDTO } from 'src/dto/featureDTO';
@@ -65,7 +66,7 @@ export class AdminService {
       
         cms.name=body.name
         cms.adminname=body.adminname
-        cms.roleid=body.roleid
+        cms.role=body.role
         
       await this.clientRepository.save(cms)
       
@@ -75,10 +76,28 @@ export class AdminService {
       
       }
 
-      async addclient(data :any) {
+ 
+      
+async addclient(@Body() body: any): Promise<ResponseModel<clienDTO>>{
 
-        return this.clientRepository.save(data)
-      }
+  console.log(body.id);
+ // const cms: Role = await this.roleRepository.findOne(body.id)
+ const cms: Client = new Client()
+  console.log(body.id);
+
+  cms.name=body.name
+  cms.adminname=body.adminname
+  cms.role=body.role
+  cms.admin=body.admin
+  
+await this.clientRepository.save(cms)
+
+const empDto:ResponseModel<clienDTO>= this.entityToDTOClient(cms)
+JSON.stringify(empDto)
+return empDto
+
+}
+
 
       
       async addCrud(data :any) {
@@ -90,6 +109,34 @@ async getRoles(){
   const emps: any[] = await this.roleRepository.find()
   //console.log("sathya")
   const empsdto: roleDTO[] = emps.map(x=> this.entityToDTO(x))
+
+  return empsdto
+}
+
+async getClient(){
+
+  const emps: any[] = await this.clientRepository.find()
+  //console.log("sathya")
+  const empsdto: clienDTO[] = emps.map(x=> this.entityToDTOClient(x))
+
+  return empsdto
+}
+private entityToDTOAdmin(data : Admin): ResponseModel<adminDTO>{
+
+  const clientdto = new ResponseModel<adminDTO>()
+   clientdto.id=data.id
+  clientdto.name = data.name
+  clientdto.password=data.password
+
+ 
+
+  return clientdto
+}
+async getAdmin(){
+
+  const emps: any[] = await this.adminRepository.find()
+  //console.log("sathya")
+  const empsdto: adminDTO[] = emps.map(x=> this.entityToDTOAdmin(x))
 
   return empsdto
 }
@@ -110,7 +157,8 @@ private entityToDTOClient(data : Client): ResponseModel<clienDTO>{
    clientdto.id=data.id
   clientdto.name = data.name
   clientdto.adminname = data.adminname
-  clientdto.roleid = data.roleid
+  clientdto.role = data.role
+  clientdto.admin = data.admin
   return clientdto
 }
 
