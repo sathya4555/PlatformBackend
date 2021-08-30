@@ -7,7 +7,7 @@ import { approleDTO } from 'src/dto/appRoleDTO';
 import { clienDTO } from 'src/dto/clientDTO';
 import { AdminService } from 'src/facade/admin.service';
 import { SNS_SQS } from 'Submodules/SNS_SQS';
-import { ApproleService } from '../approle/approle.service';
+import { ApproleService } from '../facade/approle.service';
 
 @Controller('approle')
 export class ApproleController {
@@ -137,6 +137,13 @@ public async deletefeature(@Body() body: ResponseModel<any>): Promise<ResponseMo
     return  result
 }
 
+@Post('sort')
+// @HttpCode(HttpStatus.NO_CONTENT)
+public async Sort(@Body() body: ResponseModel<approleDTO>): Promise<ResponseModel<approleDTO>>{
+    // const result = await this.appService.deleterole(body)
+    const result = await this.appService.sort(body)
+    return  result
+}
 
 
 

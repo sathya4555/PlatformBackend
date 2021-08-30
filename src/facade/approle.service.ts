@@ -10,7 +10,7 @@ import { Client } from 'src/entity/client.entity';
 import { Crud } from 'src/entity/crud.entity';
 import { Feature } from 'src/entity/features.entity';
 import { Role } from 'src/entity/role.entity';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 
 @Injectable()
 export class ApproleService {
@@ -110,5 +110,18 @@ public async deleteapprole(@Body()body:ResponseModel<approleDTO>): Promise<Respo
    return empDto
   
   }
+
+  
+async sort(@Body() body: ResponseModel<approleDTO>): Promise<ResponseModel<approleDTO>>{
+  // const cms: Client = new Client()
+  
+  const loadedPost= await getConnection()
+  .getRepository(Role)
+  .createQueryBuilder("Role")
+  .addOrderBy(`Role.${body.name}`, "ASC")
+  // .addOrderBy(`client.rolename`, "ASC")
+   .execute();
+  return loadedPost
+}
   
 }

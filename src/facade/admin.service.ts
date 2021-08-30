@@ -13,7 +13,7 @@ import { Client } from 'src/entity/client.entity';
 import { Crud } from 'src/entity/crud.entity';
 import { Feature } from 'src/entity/features.entity';
 import { Role } from 'src/entity/role.entity';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 
 @Injectable()
 export class AdminService {
@@ -278,6 +278,22 @@ private entityToDTORole(data : Role): ResponseModel<roleDTO>{
   return clientdto
 }
 
+////////////////////////////////////Sort
 
+
+async sort(@Body() body: ResponseModel<roleDTO>): Promise<ResponseModel<roleDTO>>{
+  // const cms: Client = new Client()
+  
+  const loadedPost= await getConnection()
+  .getRepository(Role)
+  .createQueryBuilder("client")
+  .addOrderBy("client.sortvariable", "ASC")
+   .execute();
+  return loadedPost
+}
 
 }
+function execute() {
+  throw new Error('Function not implemented.');
+}
+

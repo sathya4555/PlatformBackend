@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Message } from 'requestmodal/Message';
 import { RequestModel } from 'requestmodal/RequestModel';
@@ -89,14 +89,20 @@ export class AppDataController {
                     catch (error) {
                         console.log("Inside Catch.........");
                         console.log(error, result);
-                        for (let index = 0; index < result.OnFailureTopicsToPush.length; index++) {
-                            const element = result.OnFailureTopicsToPush[index];
-                            let errorResult: ResponseModel<clienDTO> = new ResponseModel<clienDTO>(null, null, null, null, null, null, null, null, null);;
-                            errorResult.setStatus(new Message("500", error, null))
-
-                            // console.log(errorResult);
-
-                            this.sns_sqs.publishMessageToTopic(element, errorResult);
+                        for (let index = 0; index < result.OnSuccessTopicsToPush.length; index++) {
+                          const element = result.OnSuccessTopicsToPush[index];
+                          let errorResult: ResponseModel<clienDTO> = new ResponseModel<clienDTO>(null, null, null, null, null, null, null, null, null);;
+                          let requestModelOfProductDto: RequestModel<clienDTO> = result["message"];
+                          
+                          
+                          errorResult.setSocketId(requestModelOfProductDto.SocketId)
+                          errorResult.setStatus(new Message("300", "Cannot complete request, please check your input", null));
+                          console.log('sockert is inside catch',requestModelOfProductDto.SocketId);
+                          errorResult.setStatus(new Message("500", error, null))
+            
+            // console.log(errorResult);
+            
+                          this.sns_sqs.publishMessageToTopic(element, errorResult);
                         }
                     }
                 }
@@ -120,11 +126,17 @@ export class AppDataController {
 
     @Post('addfeature')
     public async addFeature(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
+try{
+ //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
+ const result = await this.appService.addFeature(body)
+//  console.log("insisadajdgejdgjhhjdasfs");
+ return result
 
-        //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
-        const result = await this.appService.addFeature(body)
-        console.log("insisadajdgejdgjhhjdasfs");
-        return result
+}catch(error:any){
+    console.log('inside add client catch',error);
+    throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+}
+       
     }
 
 

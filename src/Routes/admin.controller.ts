@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { AdminService } from '../facade/admin.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt'
@@ -13,6 +13,7 @@ import { RequestModel } from 'requestmodal/RequestModel';
 import { ResponseModel } from 'requestmodal/ResponseModel';
 // import { roleDTO } from 'src/dto/roleTable.dto';
 import { Delete } from '@nestjs/common';
+import { ColdObservable } from 'rxjs/internal/testing/ColdObservable';
 
 @Controller('component')
 export class AdminController {
@@ -25,8 +26,8 @@ export class AdminController {
       
 
   private sns_sqs = SNS_SQS.getInstance();
-  private topicArray = ['STUDENT_ADD', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE','ROLE_ADD','ROLE_UPDATE','ROLE_DELETE'];
-  private serviceName = ['STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE',"STUDENTCOURSE_SERVICE","STUDENTCOURSE_SERVICE",'STUDENTCOURSE_SERVICE','STUDENTCOURSE_SERVICE'];
+  private topicArray = ['STUDENT_ADD', 'EMPLOYEE_UPDATE', 'EMPLOYEE_DELETE','ROLE_ADD','ROLE_UPDATE','ROLE_DELETE','ROLE_SORT'];
+  private serviceName = ['STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE', 'STUDENTCOURSE_SERVICE',"STUDENTCOURSE_SERVICE","STUDENTCOURSE_SERVICE",'STUDENTCOURSE_SERVICE','STUDENTCOURSE_SERVICE','STUDENTCOURSE_SERVICE'];
 
   onModuleInit() {
     console.log("inside mod")
@@ -58,6 +59,10 @@ export class AdminController {
                       console.log("Inside ROLE DELETE Topic");
                       responseModelOfProductDto = await this.deletefeature(result["message"]);
                       break;
+                      case 'ROLE_SORT':
+                      console.log("Inside ROLE SORT Topic");
+                      responseModelOfProductDto = await this.Sort(result["message"]);
+                      break;
                    
             
           
@@ -85,9 +90,15 @@ export class AdminController {
           catch (error) {
             console.log("Inside Catch.........");
             console.log(error, result);
-            for (let index = 0; index < result.OnFailureTopicsToPush.length; index++) {
-              const element = result.OnFailureTopicsToPush[index];
+            for (let index = 0; index < result.OnSuccessTopicsToPush.length; index++) {
+              const element = result.OnSuccessTopicsToPush[index];
               let errorResult: ResponseModel<clienDTO> = new ResponseModel<clienDTO>(null, null, null, null, null, null, null, null, null);;
+              let requestModelOfProductDto: RequestModel<clienDTO> = result["message"];
+              
+              
+              errorResult.setSocketId(requestModelOfProductDto.SocketId)
+              errorResult.setStatus(new Message("300", "Cannot complete request, please check your input", null));
+              console.log('sockert is inside catch',requestModelOfProductDto.SocketId);
               errorResult.setStatus(new Message("500", error, null))
 
 // console.log(errorResult);
@@ -242,11 +253,20 @@ public async addRole(@Body() body: ResponseModel<any>): Promise<ResponseModel<an
 
 @Post('addclient')
 public async adClient(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>> {
-
-  //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
+try{
   const result = await this.appService.addclient(body)
-
   return result
+
+}
+catch(error: any){
+ console.log('inside add client catch',error);
+ throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+ // return error
+}
+  //console.log("Inside CreateProduct of controller....body id" + JSON.stringify(body));
+ 
+
+
 }
 
 
@@ -317,6 +337,14 @@ public async addFeature(@Body() body: ResponseModel<any>): Promise<ResponseModel
 // @HttpCode(HttpStatus.NO_CONTENT)
 public async deletefeature(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>>{
     const result = await this.appService.deleterole(body)
+    return  result
+}
+
+@Get('sort')
+// @HttpCode(HttpStatus.NO_CONTENT)
+public async Sort(@Body() body: ResponseModel<any>): Promise<ResponseModel<any>>{
+    // const result = await this.appService.deleterole(body)
+    const result = await this.appService.sort(body)
     return  result
 }
 
